@@ -28,6 +28,8 @@ describe('SearchBar', () => {
     expect(options).toHaveLength(2)
     expect(options[0]).toHaveTextContent('광주광역시, 대한민국')
     expect(options[1]).toHaveTextContent('경기도, 대한민국')
+    // 스크린 리더가 이름과 지역을 띄어 읽도록 접근성 이름에 공백이 있어야 한다.
+    expect(options[1]).toHaveAccessibleName('광주시 경기도, 대한민국')
   })
 
   it('입력이 멈춘 뒤 한 번만 요청한다', async () => {
@@ -81,7 +83,7 @@ describe('SearchBar', () => {
   })
 
   it('결과가 없으면 안내 문구를 보여준다', async () => {
-    vi.stubGlobal('fetch', mockFetch({ geocoding: {} }))
+    vi.stubGlobal('fetch', mockFetch({ geocoding: { features: [] } }))
     const { user } = renderSearchBar()
 
     await user.type(screen.getByLabelText('도시 검색'), 'zzzz')

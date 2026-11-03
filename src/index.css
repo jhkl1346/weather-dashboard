@@ -1,1 +1,21 @@
 @import 'tailwindcss';
+
+/* 시스템 설정 대신 <html class="dark">로 다크 모드를 켜고 끈다. (수동 토글 지원) */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* 차트 색상. Recharts는 Tailwind 클래스를 쓸 수 없어서 CSS 변수로 넘긴다. */
+:root {
+  --chart-max: var(--color-orange-600);
+  --chart-min: var(--color-sky-700);
+  --chart-grid: var(--color-slate-200);
+  --chart-text: var(--color-slate-600);
+  --chart-tooltip-bg: var(--color-white);
+}
+
+.dark {
+  --chart-max: var(--color-orange-400);
+  --chart-min: var(--color-sky-400);
+  --chart-grid: var(--color-slate-700);
+  --chart-text: var(--color-slate-300);
+  --chart-tooltip-bg: var(--color-slate-800);
+}

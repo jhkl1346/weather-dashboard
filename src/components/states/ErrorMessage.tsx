@@ -7,7 +7,10 @@ type Props = {
 
 export default function ErrorMessage({ error, onRetry }: Props) {
   return (
-    <div role="alert" className="rounded-lg bg-red-50 p-4 text-red-800">
+    <div
+      role="alert"
+      className="rounded-lg bg-red-50 p-4 text-red-800 dark:bg-red-950 dark:text-red-200"
+    >
       <p>
         <span aria-hidden="true">⚠️ </span>
         {getErrorMessage(error)}

@@ -1,0 +1,2 @@
+# 저장소의 텍스트 파일은 줄바꿈을 LF로 통일한다. (Prettier 기본값과 같게 해서 Windows에서도 포맷 차이가 생기지 않게)
+* text=auto eol=lf

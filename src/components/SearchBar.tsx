@@ -67,7 +67,10 @@ export default function SearchBar({ onSelect }: Props) {
 
   return (
     <div className="relative" onBlur={handleBlur}>
-      <label htmlFor={inputId} className="mb-1 block text-sm font-medium text-slate-700">
+      <label
+        htmlFor={inputId}
+        className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300"
+      >
         도시 검색
       </label>
       <input
@@ -75,7 +78,7 @@ export default function SearchBar({ onSelect }: Props) {
         type="search"
         role="combobox"
         autoComplete="off"
-        placeholder="도시 이름을 입력하세요 (예: 부산)"
+        placeholder="도시 이름 (예: 부산)"
         aria-autocomplete="list"
         aria-expanded={showList}
         aria-controls={listboxId}
@@ -90,13 +93,13 @@ export default function SearchBar({ onSelect }: Props) {
         }}
         onFocus={() => setOpen(true)}
         onKeyDown={handleKeyDown}
-        className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 shadow-sm focus:border-sky-500 focus:ring-2 focus:ring-sky-200 focus:outline-none"
+        className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 shadow-sm focus:border-sky-500 focus:ring-2 focus:ring-sky-200 focus:outline-none dark:border-slate-600 dark:bg-slate-800 dark:placeholder:text-slate-400 dark:focus:ring-sky-800"
       />
 
       {showPanel && (
-        <div className="absolute z-10 mt-2 w-full overflow-hidden rounded-xl bg-white shadow-lg ring-1 ring-slate-200">
+        <div className="absolute z-10 mt-2 w-full overflow-hidden rounded-xl bg-white shadow-lg ring-1 ring-slate-200 dark:bg-slate-800 dark:ring-slate-700">
           {isLoading && (
-            <p role="status" className="p-4 text-slate-600">
+            <p role="status" className="p-4 text-slate-600 dark:text-slate-300">
               검색 중…
             </p>
           )}
@@ -120,10 +123,13 @@ export default function SearchBar({ onSelect }: Props) {
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => select(city)}
                   onMouseEnter={() => setActiveIndex(i)}
-                  className={`cursor-pointer px-4 py-3 ${i === activeIndex ? 'bg-sky-50' : ''}`}
+                  className={`cursor-pointer px-4 py-3 ${i === activeIndex ? 'bg-sky-50 dark:bg-slate-700' : ''}`}
                 >
                   <span className="font-medium">{city.name}</span>
-                  <span className="ml-2 text-sm text-slate-500">{formatCityRegion(city)}</span>
+                  {/* span 밖에 공백을 둬야 스크린 리더가 '전주시 전북특별자치도'처럼 띄어 읽는다. */}{' '}
+                  <span className="ml-1 text-sm text-slate-500 dark:text-slate-400">
+                    {formatCityRegion(city)}
+                  </span>
                 </li>
               ))}
             </ul>

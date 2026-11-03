@@ -3,7 +3,7 @@
 > 이 문서를 프로젝트 루트에 `SPEC.md`로 두고, 위에서부터 순서대로 진행합니다.
 > Claude Code와 작업할 때는 "SPEC.md를 읽고 다음 마일스톤을 진행해줘"처럼 요청하면 됩니다.
 >
-> **현재 진행 상황 (2026-11-03 기준):** 마일스톤 0~2 구현 완료 (마일스톤 1·2 커밋/push 대기). 다음은 마일스톤 3입니다.
+> **현재 진행 상황 (2026-11-03 기준):** 마일스톤 0~3 구현 완료 (마일스톤 1·2는 PR #1로 머지, 마일스톤 3은 커밋 대기). 다음은 마일스톤 4입니다.
 
 ---
 
@@ -53,12 +53,19 @@
 
 ### 3-1. 도시 검색 (지오코딩)
 
+> 처음에는 Open-Meteo 지오코딩을 썼지만, 한국 시·군이 빠져 있거나(삼척, 보은 등) 같은 이름의 작은 마을·북한 지역이
+> 섞여 나와서 Photon(OpenStreetMap 데이터, API 키 없음)으로 바꿨습니다. 검색 범위는 **대한민국 시·군**으로 한정합니다.
+
 ```
-GET https://geocoding-api.open-meteo.com/v1/search
-  ?name=서울&count=5&language=ko&format=json
+GET https://photon.komoot.io/api/
+  ?q=전주&limit=10&lang=default
+  &bbox=124.5,33.0,132.0,38.7
+  &osm_tag=place:city&osm_tag=place:county
 ```
 
-응답에서 사용할 값: `name`, `country`, `admin1`, `latitude`, `longitude`, `timezone`
+응답에서 사용할 값: `properties.name`, `properties.state`, `properties.countrycode`(KR만 사용), `geometry.coordinates`(경도, 위도)
+
+- 무료 공용 서버라 요청이 많으면 잠시 막힐 수 있음(429) → 자동 재시도하지 않고 "다시 시도" 버튼으로 안내
 
 ### 3-2. 날씨 예보
 
@@ -96,12 +103,12 @@ GET https://api.open-meteo.com/v1/forecast
 
 ### 확장 (추천)
 
-- [ ] 현재 위치로 날씨 조회 (권한 거부 시 안내)
-- [ ] 주간 기온 차트 (최고/최저 라인)
-- [ ] 즐겨찾기 도시 (localStorage 저장, 클릭 시 바로 조회)
-- [ ] 섭씨/화씨 단위 전환 (설정 저장)
-- [ ] 다크 모드 (시스템 설정 연동 + 수동 토글)
-- [ ] 마지막으로 본 도시 기억
+- [x] 현재 위치로 날씨 조회 (권한 거부 시 안내)
+- [x] 주간 기온 차트 (최고/최저 라인)
+- [x] 즐겨찾기 도시 (localStorage 저장, 클릭 시 바로 조회)
+- [x] 섭씨/화씨 단위 전환 (설정 저장)
+- [x] 다크 모드 (시스템 설정 연동 + 수동 토글)
+- [x] 마지막으로 본 도시 기억
 
 ### 도전 (선택)
 
@@ -192,9 +199,9 @@ SearchBar (입력) → useDebounce(300ms) → 지오코딩 쿼리 → 결과 목
 ### 6-4. 예외 상황 체크
 
 - [x] 검색어 입력 중 이전 요청이 늦게 도착하는 경우 (요청 취소 또는 TanStack Query 키로 해결)
-- [ ] 위치 권한을 거부한 경우
+- [x] 위치 권한을 거부한 경우
 - [x] 오프라인 상태
-- [ ] localStorage가 막혀 있는 환경 (try/catch)
+- [x] localStorage가 막혀 있는 환경 (try/catch)
 - [x] 같은 이름의 도시가 여러 개인 경우 (국가/지역 같이 표시)
 
 ### 6-5. 접근성
@@ -224,7 +231,7 @@ SearchBar (입력) → useDebounce(300ms) → 지오코딩 쿼리 → 결과 목
 - [x] 하드코딩한 도시(서울)로 현재 날씨 표시
 - [x] 단위 테스트: 응답 → 도메인 타입 변환 함수
 - [x] `npm run dev`로 실제 서울 날씨가 뜨는지 확인
-- [ ] 커밋/push
+- [x] 커밋/push
 - 참고: `lib/weatherCode.ts`(날씨 코드 매핑)와 `useWeather` 훅, `CurrentWeather` 컴포넌트도 함께 구현됨
 
 ### 마일스톤 2. 검색과 예보 UI (반나절)
@@ -233,14 +240,15 @@ SearchBar (입력) → useDebounce(300ms) → 지오코딩 쿼리 → 결과 목
 - [x] 7일 예보 리스트
 - [x] Loading / Error / Empty 상태 컴포넌트
 - [x] `weatherCode.ts` 매핑
-- [ ] 커밋/push
+- [x] 커밋/push
 
 ### 마일스톤 3. 확장 기능 (하루)
 
-- [ ] 주간 기온 차트
-- [ ] 현재 위치 조회
-- [ ] 즐겨찾기 + localStorage
-- [ ] 단위 전환, 다크 모드
+- [x] 주간 기온 차트
+- [x] 현재 위치 조회
+- [x] 즐겨찾기 + localStorage
+- [x] 단위 전환, 다크 모드
+- [ ] 커밋/push
 
 ### 마일스톤 4. 품질과 배포 (반나절)
 
