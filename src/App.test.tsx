@@ -174,7 +174,7 @@ describe('App 마일스톤 3 기능', () => {
     expect(await screen.findByText('경기도, 대한민국')).toBeInTheDocument()
   })
 
-  it('현재 위치 버튼을 누르면 그 좌표의 날씨를 보여준다', async () => {
+  it('현재 위치 버튼을 누르면 그 좌표의 날씨와 지명을 보여준다', async () => {
     const fetchMock = mockFetch()
     vi.stubGlobal('fetch', fetchMock)
     mockGeolocation({ lat: 36.12, lon: 128.34 })
@@ -185,10 +185,29 @@ describe('App 마일스톤 3 기능', () => {
     await user.click(screen.getByRole('button', { name: '현재 위치' }))
 
     const current = await screen.findByRole('region', { name: '현재 날씨' })
-    expect(await within(current).findByText('위도 36.12, 경도 128.34')).toBeInTheDocument()
-    expect(String(fetchMock.mock.calls.at(-1)?.[0])).toContain('latitude=36.12')
-    // 현재 위치는 이름이 없어서 즐겨찾기 버튼을 보여주지 않는다.
+    expect(await within(current).findByText('구미시')).toBeInTheDocument()
+    expect(within(current).getByText('현재 위치 · 경상북도, 대한민국')).toBeInTheDocument()
+    const urls = fetchMock.mock.calls.map(([url]) => String(url))
+    expect(urls.some((url) => url.includes('open-meteo') && url.includes('latitude=36.12'))).toBe(
+      true,
+    )
+    expect(urls.some((url) => url.includes('/reverse') && url.includes('lat=36.12'))).toBe(true)
+    // 현재 위치는 좌표가 조금만 달라도 바뀌므로 즐겨찾기 버튼을 보여주지 않는다.
     expect(within(current).queryByRole('button', { name: /즐겨찾기/ })).not.toBeInTheDocument()
+  })
+
+  it('지명을 찾지 못하면 "현재 위치"와 좌표를 보여준다', async () => {
+    vi.stubGlobal('fetch', mockFetch({ reverse: 503 }))
+    mockGeolocation({ lat: 36.12, lon: 128.34 })
+    const user = userEvent.setup()
+    renderApp()
+
+    await screen.findByText('12°C')
+    await user.click(screen.getByRole('button', { name: '현재 위치' }))
+
+    const current = await screen.findByRole('region', { name: '현재 날씨' })
+    expect(await within(current).findByText('위도 36.12, 경도 128.34')).toBeInTheDocument()
+    expect(within(current).getByRole('heading', { name: '현재 위치' })).toBeInTheDocument()
   })
 
   it('위치 권한을 거부하면 안내 메시지를 보여주고, 보던 도시는 그대로 둔다', async () => {
