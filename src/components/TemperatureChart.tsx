@@ -26,7 +26,7 @@ export default function TemperatureChart({ days, unit }: Props) {
   return (
     <section
       aria-labelledby="temperature-chart-title"
-      className="rounded-2xl bg-white p-6 shadow md:col-span-2 dark:bg-slate-800"
+      className="rounded-2xl bg-white p-6 shadow lg:col-span-2 dark:bg-slate-800"
     >
       <h2
         id="temperature-chart-title"

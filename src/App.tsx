@@ -86,13 +86,18 @@ export default function App() {
           onRemove={favorites.remove}
         />
 
+        {/* 도시가 바뀌어 새 날씨가 뜨면 스크린 리더에 알려 준다. 영역은 항상 있어야 변화가 읽힌다. */}
+        <p aria-live="polite" className="sr-only">
+          {data && !isPending && !isError ? `${city.name} 날씨를 보여주고 있어요.` : ''}
+        </p>
+
         <div className="mt-6">
           {isPending ? (
             <WeatherSkeleton />
           ) : isError ? (
             <ErrorMessage error={error} onRetry={() => refetch()} />
           ) : (
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
               <CurrentWeather
                 cityName={city.name}
                 region={describeRegion(city)}

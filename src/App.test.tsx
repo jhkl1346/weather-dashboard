@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, screen, within } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import App from './App'
 import { forecastResponse, mockFetch } from './test/fixtures'
@@ -67,6 +67,19 @@ describe('App', () => {
     const lastUrl = String(fetchMock.mock.calls.at(-1)?.[0])
     expect(lastUrl).toContain('latitude=37.41')
     expect(lastUrl).toContain('longitude=127.26')
+  })
+
+  it('도시가 바뀌면 스크린 리더용 안내 문구도 바뀐다', async () => {
+    vi.stubGlobal('fetch', mockFetch())
+    const { container } = renderApp()
+    const user = userEvent.setup()
+    const live = container.querySelector('[aria-live="polite"]')
+
+    await waitFor(() => expect(live).toHaveTextContent('서울 날씨를 보여주고 있어요.'))
+    await user.type(screen.getByLabelText('도시 검색'), '광주')
+    await user.click((await screen.findAllByRole('option'))[1])
+
+    await waitFor(() => expect(live).toHaveTextContent('광주시 날씨를 보여주고 있어요.'))
   })
 
   it('실패하면 에러 메시지와 다시 시도 버튼을 보여준다', async () => {

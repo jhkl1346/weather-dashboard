@@ -4,7 +4,7 @@ function Bar({ className }: { className: string }) {
 
 export default function WeatherSkeleton() {
   return (
-    <div role="status" className="grid grid-cols-1 gap-4 md:grid-cols-2">
+    <div role="status" className="grid grid-cols-1 gap-4 lg:grid-cols-2">
       <span className="sr-only">날씨 정보를 불러오는 중…</span>
       <div aria-hidden="true" className="rounded-2xl bg-white p-6 shadow dark:bg-slate-800">
         <Bar className="h-5 w-24" />
