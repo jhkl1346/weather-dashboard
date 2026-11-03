@@ -1,7 +1,9 @@
 # 날씨 대시보드 프로젝트 기획서
 
 > 이 문서를 프로젝트 루트에 `SPEC.md`로 두고, 위에서부터 순서대로 진행합니다.
-> Claude Code와 작업할 때는 "SPEC.md의 마일스톤 1부터 진행해줘"처럼 요청하면 됩니다.
+> Claude Code와 작업할 때는 "SPEC.md를 읽고 다음 마일스톤을 진행해줘"처럼 요청하면 됩니다.
+>
+> **현재 진행 상황 (2026-11-03 기준):** 마일스톤 0~2 구현 완료 (마일스톤 1·2 커밋/push 대기). 다음은 마일스톤 3입니다.
 
 ---
 
@@ -36,7 +38,7 @@
 | 차트       | Recharts                        | React와 궁합이 좋고 설정이 간단                |
 | 스타일     | Tailwind CSS (또는 CSS Modules) | 빠른 반응형 구현                               |
 | 테스트     | Vitest + React Testing Library  | Vite와 통합이 쉬움                             |
-| 린트/포맷  | ESLint + Prettier               | 코드 품질 기본기                               |
+| 린트/포맷  | oxlint + Prettier               | Vite 템플릿 기본 린터로 빠르고 설정이 간단함   |
 | 배포       | Vercel (또는 Netlify)           | Git push만으로 자동 배포                       |
 
 ### 날씨 API: Open-Meteo 사용
@@ -86,10 +88,10 @@ GET https://api.open-meteo.com/v1/forecast
 
 ### MVP (필수)
 
-- [ ] 도시 이름 검색 + 검색 결과 목록에서 선택
-- [ ] 현재 날씨 카드 (기온, 체감, 습도, 풍속, 날씨 아이콘/설명)
-- [ ] 7일 예보 리스트 (요일, 아이콘, 최고/최저, 강수 확률)
-- [ ] 로딩 스켈레톤 / 에러 메시지 / 검색 결과 없음 상태
+- [x] 도시 이름 검색 + 검색 결과 목록에서 선택
+- [x] 현재 날씨 카드 (기온, 체감, 습도, 풍속, 날씨 아이콘/설명)
+- [x] 7일 예보 리스트 (요일, 아이콘, 최고/최저, 강수 확률)
+- [x] 로딩 스켈레톤 / 에러 메시지 / 검색 결과 없음 상태
 - [ ] 반응형 레이아웃 (모바일 → 데스크톱)
 
 ### 확장 (추천)
@@ -189,11 +191,11 @@ SearchBar (입력) → useDebounce(300ms) → 지오코딩 쿼리 → 결과 목
 
 ### 6-4. 예외 상황 체크
 
-- [ ] 검색어 입력 중 이전 요청이 늦게 도착하는 경우 (요청 취소 또는 TanStack Query 키로 해결)
+- [x] 검색어 입력 중 이전 요청이 늦게 도착하는 경우 (요청 취소 또는 TanStack Query 키로 해결)
 - [ ] 위치 권한을 거부한 경우
-- [ ] 오프라인 상태
+- [x] 오프라인 상태
 - [ ] localStorage가 막혀 있는 환경 (try/catch)
-- [ ] 같은 이름의 도시가 여러 개인 경우 (국가/지역 같이 표시)
+- [x] 같은 이름의 도시가 여러 개인 경우 (국가/지역 같이 표시)
 
 ### 6-5. 접근성
 
@@ -210,24 +212,28 @@ SearchBar (입력) → useDebounce(300ms) → 지오코딩 쿼리 → 결과 목
 
 ### 마일스톤 0. 프로젝트 세팅 (30분)
 
-- [ ] `npm create vite@latest` (React + TypeScript)
-- [ ] ESLint, Prettier, Vitest, Tailwind 설치 및 설정
-- [ ] Git 저장소 생성, GitHub 연결, 첫 커밋
-- [ ] README 초안 (프로젝트 소개만)
+- [x] `npm create vite@latest` (React + TypeScript)
+- [x] oxlint, Prettier, Vitest, Tailwind 설치 및 설정
+- [x] Git 저장소 생성, GitHub 연결, 첫 커밋
+- [x] README 초안 (프로젝트 소개만)
 
 ### 마일스톤 1. 날씨 조회 핵심 흐름 (반나절)
 
-- [ ] 타입 정의 (`types/weather.ts`)
-- [ ] `api/geocoding.ts`, `api/forecast.ts` 구현
-- [ ] 하드코딩한 도시(서울)로 현재 날씨 표시
-- [ ] 단위 테스트: 응답 → 도메인 타입 변환 함수
+- [x] 타입 정의 (`types/weather.ts`)
+- [x] `api/geocoding.ts`, `api/forecast.ts` 구현
+- [x] 하드코딩한 도시(서울)로 현재 날씨 표시
+- [x] 단위 테스트: 응답 → 도메인 타입 변환 함수
+- [x] `npm run dev`로 실제 서울 날씨가 뜨는지 확인
+- [ ] 커밋/push
+- 참고: `lib/weatherCode.ts`(날씨 코드 매핑)와 `useWeather` 훅, `CurrentWeather` 컴포넌트도 함께 구현됨
 
 ### 마일스톤 2. 검색과 예보 UI (반나절)
 
-- [ ] SearchBar + 디바운스 + 결과 목록
-- [ ] 7일 예보 리스트
-- [ ] Loading / Error / Empty 상태 컴포넌트
-- [ ] `weatherCode.ts` 매핑
+- [x] SearchBar + 디바운스 + 결과 목록
+- [x] 7일 예보 리스트
+- [x] Loading / Error / Empty 상태 컴포넌트
+- [x] `weatherCode.ts` 매핑
+- [ ] 커밋/push
 
 ### 마일스톤 3. 확장 기능 (하루)
 
