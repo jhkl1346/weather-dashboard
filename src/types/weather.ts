@@ -5,6 +5,8 @@ export type City = {
   admin1?: string
   lat: number
   lon: number
+  /** 브라우저 위치로 조회한 경우 (이름 대신 '현재 위치'로 표시) */
+  isCurrentLocation?: boolean
 }
 
 /** 현재 날씨 */

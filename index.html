@@ -8,6 +8,17 @@
     />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Weather Dashboard</title>
+    <script>
+      // React가 뜨기 전에 다크 모드를 먼저 적용해서, 흰 화면이 번쩍이는 것을 막는다.
+      // (src/hooks/useTheme.ts와 같은 저장 키와 규칙을 쓴다)
+      try {
+        var theme = JSON.parse(localStorage.getItem('weather-dashboard:theme'))
+        var systemDark = matchMedia('(prefers-color-scheme: dark)').matches
+        if (theme === 'dark' || (theme !== 'light' && systemDark)) {
+          document.documentElement.classList.add('dark')
+        }
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>
