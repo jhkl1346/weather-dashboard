@@ -92,7 +92,7 @@ export default function App() {
           ) : isError ? (
             <ErrorMessage error={error} onRetry={() => refetch()} />
           ) : (
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
               <CurrentWeather
                 cityName={city.name}
                 region={describeRegion(city)}

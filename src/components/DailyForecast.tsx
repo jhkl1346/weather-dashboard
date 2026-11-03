@@ -34,9 +34,12 @@ export default function DailyForecast({ days, unit }: Props) {
               <span className="text-2xl" aria-hidden="true" title={label}>
                 {icon}
               </span>
-              {/* 좁은 화면에서는 아이콘만 보이고, 설명은 스크린 리더용으로 남긴다. */}
-              <span className="sr-only min-w-0 flex-1 truncate text-sm text-slate-600 sm:not-sr-only dark:text-slate-300 sm:whitespace-nowrap">
-                {label}
+              {/* 좁은 화면에서는 아이콘만 보이고, 설명은 스크린 리더용으로 남긴다.
+                  not-sr-only가 overflow를 visible로 되돌리므로, 말줄임(truncate)은 안쪽 span에 둔다. */}
+              <span className="sr-only text-sm text-slate-600 sm:not-sr-only sm:min-w-0 sm:flex-1 dark:text-slate-300">
+                <span className="block truncate" title={label}>
+                  {label}
+                </span>
               </span>
               <span className="flex-1 sm:hidden" aria-hidden="true" />
               <span className="w-14 shrink-0 text-right text-sm text-sky-700 dark:text-sky-300">
