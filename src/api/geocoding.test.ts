@@ -1,5 +1,11 @@
 import { geocodingResponse } from '../test/fixtures'
-import { searchCities, toCities, type PhotonResponse } from './geocoding'
+import {
+  reverseGeocode,
+  searchCities,
+  toCities,
+  toPlaceName,
+  type PhotonResponse,
+} from './geocoding'
 
 const feature = (name: string, lon: number, lat: number, countrycode = 'KR', state?: string) => ({
   geometry: { coordinates: [lon, lat] as [number, number] },
@@ -85,5 +91,83 @@ describe('searchCities', () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 429 }))
 
     await expect(searchCities('수원')).rejects.toThrow('429')
+  })
+})
+
+describe('toPlaceName', () => {
+  // 실제 Photon 역지오코딩 응답에서 필요한 값만 남긴 샘플
+  it('시 지역은 city 이름을 쓴다', () => {
+    const raw = {
+      features: [
+        {
+          properties: {
+            osm_key: 'amenity',
+            osm_value: 'townhall',
+            name: '전주시청',
+            city: '전주시',
+            state: '전북특별자치도',
+            country: '대한민국',
+          },
+        },
+      ],
+    }
+    expect(toPlaceName(raw)).toEqual({
+      name: '전주시',
+      admin1: '전북특별자치도',
+      country: '대한민국',
+    })
+  })
+
+  it('군 지역은 읍·면(city) 대신 county 이름을 쓴다', () => {
+    const raw = {
+      features: [{ properties: { city: '정선읍', county: '정선군', state: '강원특별자치도' } }],
+    }
+    expect(toPlaceName(raw)?.name).toBe('정선군')
+  })
+
+  it('찾은 장소가 시·군 자체면 그 이름을 쓴다', () => {
+    const raw = {
+      features: [
+        {
+          properties: {
+            osm_key: 'place',
+            osm_value: 'county',
+            name: '보은군',
+            state: '충청북도',
+            country: '대한민국',
+          },
+        },
+      ],
+    }
+    expect(toPlaceName(raw)?.name).toBe('보은군')
+  })
+
+  it('결과가 없거나 시·군 이름이 없으면 null을 돌려준다', () => {
+    expect(toPlaceName({ features: [] })).toBeNull()
+    expect(toPlaceName({ features: [{ properties: { state: '충청북도' } }] })).toBeNull()
+  })
+})
+
+describe('reverseGeocode', () => {
+  afterEach(() => vi.unstubAllGlobals())
+
+  it('좌표로 한 곳만, 한글 이름으로 요청한다', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ features: [] }) })
+    vi.stubGlobal('fetch', fetchMock)
+
+    expect(await reverseGeocode(35.82, 127.15)).toBeNull()
+
+    const url = new URL(String(fetchMock.mock.calls[0][0]))
+    expect(url.pathname).toBe('/reverse')
+    expect(url.searchParams.get('lat')).toBe('35.82')
+    expect(url.searchParams.get('lon')).toBe('127.15')
+    expect(url.searchParams.get('limit')).toBe('1')
+    expect(url.searchParams.get('lang')).toBe('default')
+  })
+
+  it('HTTP 오류면 상태 코드와 함께 예외를 던진다', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 503 }))
+
+    await expect(reverseGeocode(35.82, 127.15)).rejects.toThrow('503')
   })
 })

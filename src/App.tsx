@@ -10,11 +10,13 @@ import WeatherSkeleton from './components/states/WeatherSkeleton'
 import { useFavorites } from './hooks/useFavorites'
 import { useGeolocation } from './hooks/useGeolocation'
 import { useLocalStorage } from './hooks/useLocalStorage'
+import { usePlaceName } from './hooks/usePlaceName'
 import { useTheme } from './hooks/useTheme'
 import { useWeather } from './hooks/useWeather'
 import { isCity } from './lib/city'
 import { formatCityRegion } from './lib/format'
 import { isTempUnit, type TempUnit } from './lib/units'
+import type { PlaceName } from './api/geocoding'
 import type { City } from './types/weather'
 
 // 차트 라이브러리(Recharts)가 커서, 첫 화면을 빨리 띄우려고 따로 나눠서 불러온다.
@@ -29,10 +31,12 @@ const DEFAULT_CITY: City = {
   lon: 126.978,
 }
 
-function describeRegion(city: City): string {
-  return city.isCurrentLocation
-    ? `위도 ${city.lat.toFixed(2)}, 경도 ${city.lon.toFixed(2)}`
-    : formatCityRegion(city)
+function describeRegion(city: City, place: PlaceName | null | undefined): string {
+  if (!city.isCurrentLocation) return formatCityRegion(city)
+  // 지명을 찾았으면 '현재 위치'임을 함께 알리고, 못 찾았으면 좌표를 보여준다.
+  return place
+    ? `현재 위치 · ${formatCityRegion(place)}`
+    : `위도 ${city.lat.toFixed(2)}, 경도 ${city.lon.toFixed(2)}`
 }
 
 export default function App() {
@@ -45,6 +49,10 @@ export default function App() {
     setCity({ name: '현재 위치', country: '', lat, lon, isCurrentLocation: true }),
   )
   const { data, isPending, isError, error, refetch } = useWeather(city.lat, city.lon)
+  // 현재 위치는 좌표만 있으므로 지명을 따로 찾는다. 찾기 전이나 실패하면 '현재 위치'로 보여준다.
+  const placeName = usePlaceName(city.lat, city.lon, !!city.isCurrentLocation)
+  const place = city.isCurrentLocation ? placeName.data : undefined
+  const cityName = place?.name ?? city.name
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100">
@@ -88,7 +96,7 @@ export default function App() {
 
         {/* 도시가 바뀌어 새 날씨가 뜨면 스크린 리더에 알려 준다. 영역은 항상 있어야 변화가 읽힌다. */}
         <p aria-live="polite" className="sr-only">
-          {data && !isPending && !isError ? `${city.name} 날씨를 보여주고 있어요.` : ''}
+          {data && !isPending && !isError ? `${cityName} 날씨를 보여주고 있어요.` : ''}
         </p>
 
         <div className="mt-6">
@@ -99,8 +107,8 @@ export default function App() {
           ) : (
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
               <CurrentWeather
-                cityName={city.name}
-                region={describeRegion(city)}
+                cityName={cityName}
+                region={describeRegion(city, place)}
                 weather={data.current}
                 unit={unit}
                 favorite={

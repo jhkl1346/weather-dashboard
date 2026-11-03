@@ -8,6 +8,7 @@ import type { City } from '../types/weather'
  * 섞여 나와서, 대한민국 시·군만 정확히 찾을 수 있는 Photon으로 바꿨다.
  */
 const BASE_URL = 'https://photon.komoot.io/api/'
+const REVERSE_URL = 'https://photon.komoot.io/reverse'
 const MAX_RESULTS = 5
 // 대한민국을 감싸는 사각형(서쪽 경도, 남쪽 위도, 동쪽 경도, 북쪽 위도). 독도까지 포함한다.
 const KOREA_BBOX = '124.5,33.0,132.0,38.7'
@@ -74,4 +75,61 @@ export async function searchCities(query: string, signal?: AbortSignal): Promise
     throw new HttpError(res.status, '도시 검색에 실패했어요.')
   }
   return toCities((await res.json()) as PhotonResponse)
+}
+
+type PhotonReverseFeature = {
+  properties: {
+    osm_key?: string
+    osm_value?: string
+    name?: string
+    city?: string
+    county?: string
+    state?: string
+    country?: string
+  }
+}
+
+export type PhotonReverseResponse = {
+  features: PhotonReverseFeature[]
+}
+
+/** 좌표로 찾은 지명 (예: 전주시, 전북특별자치도, 대한민국) */
+export type PlaceName = {
+  name: string
+  admin1?: string
+  country: string
+}
+
+/**
+ * 좌표 근처 장소에서 시·군 이름을 꺼낸다.
+ * - 찾은 장소가 시·군 자체면 그 이름을 쓴다. (예: 보은군)
+ * - 군 지역은 city에 읍·면 이름(정선읍)이 들어 있어서 county(정선군)를 먼저 본다.
+ */
+export function toPlaceName(raw: PhotonReverseResponse): PlaceName | null {
+  const p = raw.features[0]?.properties
+  if (!p) return null
+  const isCityOrCounty =
+    p.osm_key === 'place' && (p.osm_value === 'city' || p.osm_value === 'county')
+  const name = isCityOrCounty ? p.name : (p.county ?? p.city)
+  if (!name) return null
+  return { name, admin1: p.state, country: p.country ?? '' }
+}
+
+/** 좌표를 지명으로 바꾼다. (역지오코딩) */
+export async function reverseGeocode(
+  lat: number,
+  lon: number,
+  signal?: AbortSignal,
+): Promise<PlaceName | null> {
+  const params = new URLSearchParams({
+    lat: String(lat),
+    lon: String(lon),
+    limit: '1',
+    lang: 'default',
+  })
+  const res = await fetch(`${REVERSE_URL}?${params}`, { signal })
+  if (!res.ok) {
+    throw new HttpError(res.status, '현재 위치의 지명을 찾지 못했어요.')
+  }
+  return toPlaceName((await res.json()) as PhotonReverseResponse)
 }
