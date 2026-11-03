@@ -126,7 +126,8 @@ export default function SearchBar({ onSelect }: Props) {
                   className={`cursor-pointer px-4 py-3 ${i === activeIndex ? 'bg-sky-50 dark:bg-slate-700' : ''}`}
                 >
                   <span className="font-medium">{city.name}</span>
-                  <span className="ml-2 text-sm text-slate-500 dark:text-slate-400">
+                  {/* span 밖에 공백을 둬야 스크린 리더가 '전주시 전북특별자치도'처럼 띄어 읽는다. */}{' '}
+                  <span className="ml-1 text-sm text-slate-500 dark:text-slate-400">
                     {formatCityRegion(city)}
                   </span>
                 </li>

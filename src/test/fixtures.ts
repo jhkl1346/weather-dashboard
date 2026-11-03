@@ -1,5 +1,5 @@
 import type { ForecastResponse } from '../api/forecast'
-import type { GeocodingResponse } from '../api/geocoding'
+import type { PhotonResponse } from '../api/geocoding'
 
 export const forecastResponse: ForecastResponse = {
   current: {
@@ -18,30 +18,26 @@ export const forecastResponse: ForecastResponse = {
   },
 }
 
-// 같은 이름의 도시가 여러 개인 경우를 확인하기 위한 샘플
-export const geocodingResponse: GeocodingResponse = {
-  results: [
+// 같은 이름의 도시가 여러 개인 경우와, 걸러야 하는 결과(북한)를 확인하기 위한 Photon 응답 샘플
+export const geocodingResponse: PhotonResponse = {
+  features: [
     {
-      name: '광주',
-      country: '대한민국',
-      admin1: '광주광역시',
-      latitude: 35.15,
-      longitude: 126.85,
-      population: 1401235,
+      geometry: { coordinates: [126.85, 35.15] },
+      properties: { name: '광주', state: '광주광역시', countrycode: 'KR' },
     },
     {
-      name: '광주',
-      country: '대한민국',
-      admin1: '경기도',
-      latitude: 37.41,
-      longitude: 127.26,
-      population: 81780,
+      geometry: { coordinates: [127.26, 37.41] },
+      properties: { name: '광주시', state: '경기도', countrycode: 'KR' },
+    },
+    {
+      geometry: { coordinates: [125.0, 37.9] },
+      properties: { name: '광주', state: '황해남도', countrycode: 'KP' },
     },
   ],
 }
 
 type MockOptions = {
-  geocoding?: GeocodingResponse | number
+  geocoding?: PhotonResponse | number
   forecast?: ForecastResponse | number
 }
 
@@ -51,7 +47,7 @@ export function mockFetch({
   forecast = forecastResponse,
 }: MockOptions = {}) {
   return vi.fn(async (input: string | URL) => {
-    const body = String(input).includes('geocoding-api') ? geocoding : forecast
+    const body = String(input).includes('photon.komoot.io') ? geocoding : forecast
     return typeof body === 'number'
       ? { ok: false, status: body }
       : { ok: true, status: 200, json: async () => body }
