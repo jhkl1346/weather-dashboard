@@ -3,7 +3,7 @@
 > 이 문서를 프로젝트 루트에 `SPEC.md`로 두고, 위에서부터 순서대로 진행합니다.
 > Claude Code와 작업할 때는 "SPEC.md를 읽고 다음 마일스톤을 진행해줘"처럼 요청하면 됩니다.
 >
-> **현재 진행 상황 (2026-11-03 기준):** 마일스톤 0~3 완료 (PR #1, #2로 머지). 마일스톤 4는 Vercel 배포만 남았습니다. (배포는 Vercel 계정으로 직접 연결 필요)
+> **현재 진행 상황 (2026-11-03 기준):** 마일스톤 0~4 완료 (PR #1~#3으로 머지, Vercel 배포: https://weather-dashboard-tau-ecru.vercel.app). 다음은 마일스톤 5(선택)입니다.
 
 ---
 
@@ -255,9 +255,9 @@ SearchBar (입력) → useDebounce(300ms) → 지오코딩 쿼리 → 결과 목
 - [x] 반응형 점검 (360px, 768px, 1280px)
 - [x] 접근성 점검 (키보드만으로 사용해 보기, Lighthouse)
 - [x] 테스트 보강 (훅, 주요 컴포넌트)
-- [ ] Vercel 배포
+- [x] Vercel 배포 (https://weather-dashboard-tau-ecru.vercel.app, main에 push하면 자동 배포)
 - [x] GitHub Actions로 테스트/린트 자동화
-- [x] README 완성 (배포 링크만 추가 필요)
+- [x] README 완성
 - 참고: 768px에서 예보 설명이 겹치는 문제를 고치면서 2열 레이아웃 기준을 1024px(lg)로 바꿈. Lighthouse 접근성 100, axe-core 위반 0건
 
 ### 마일스톤 5. 도전 과제 (선택)
@@ -321,7 +321,7 @@ README에 반드시 넣을 것
 
 ## 12. 최종 체크리스트
 
-- [ ] 배포 링크가 정상 동작하고 README에 걸려 있다
+- [x] 배포 링크가 정상 동작하고 README에 걸려 있다
 - [x] 모바일에서도 깨지지 않는다
 - [x] 로딩 / 에러 / 빈 상태가 모두 처리되어 있다
 - [x] `npm run lint`, `npm test`가 통과한다

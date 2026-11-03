@@ -2,7 +2,7 @@
 
 도시를 검색하거나 현재 위치로 현재 날씨, 7일 예보, 주간 기온 차트를 보여주는 웹 앱입니다.
 
-- 배포 링크: (Vercel 배포 후 추가)
+- 배포 링크: <https://weather-dashboard-tau-ecru.vercel.app>
 - [![CI](https://github.com/jhkl1346/weather-dashboard/actions/workflows/ci.yml/badge.svg)](https://github.com/jhkl1346/weather-dashboard/actions/workflows/ci.yml)
 
 | 데스크톱 (라이트)                                    | 모바일 (다크)                                                              |
